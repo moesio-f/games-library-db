@@ -1,0 +1,2 @@
+data/steam-games/games.json filter=lfs diff=lfs merge=lfs -text
+data/steam-store-games/steam_description_data.csv filter=lfs diff=lfs merge=lfs -text

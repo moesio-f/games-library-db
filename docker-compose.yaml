@@ -1,0 +1,57 @@
+services:
+  mongodb:
+    image: mongo:latest
+    restart: no
+    environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: root
+        MONGO_INITDB_DATABASE: users
+    ports:
+        - 27017:27017
+    volumes:
+        - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  mariadb:
+    image: mariadb:latest
+    restart: no
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: collections
+    ports:
+      - 3306:3306
+    volumes:
+      - ./scripts/mariadb-init.sql:/docker-entrypoint-initdb.d/mariadb-init.sql:ro
+      - ./data/relational-db-data:/tmp/data:ro
+
+  neo4j:
+    build:
+      context: .
+      dockerfile: Dockerfile.neo4j
+    restart: no
+    environment:
+      ROOT_PASS: root
+    ports:
+      - 7474:7474
+      - 7687:7687
+
+  mongo-express:
+    image: mongo-express:latest
+    restart: no
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root
+      ME_CONFIG_BASICAUTH_USERNAME: root
+      ME_CONFIG_BASICAUTH_PASSWORD: root
+      ME_CONFIG_MONGODB_SERVER: mongodb
+    ports:
+      - 8000:8081
+    depends_on:
+      - mongodb
+
+  adminer:
+    image: adminer:latest
+    restart: no
+    ports:
+      - 8001:8080
+    depends_on:
+      - mariadb
